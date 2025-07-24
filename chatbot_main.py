@@ -1,4 +1,6 @@
 # chatbot/chatbot_main.py
+
+from utils.api_client import fetch_products
 from nlp.intent_engine import IntentEngine
 
 intent_engine = IntentEngine() # creates an object of the IntentEngine class
@@ -13,6 +15,11 @@ while True:
         break
 
     intent = intent_engine.detect_intent(user_input) # Calls NLP module to analyze the user's text and classify it into an intent
+
+    if intent == "show_products":
+        products = fetch_products()
+        for p in products:
+          print(f"- {p['product_name']} (${p['product_price']})")
 
     responses = {
         "greet": "Hello! How can I help you today?",

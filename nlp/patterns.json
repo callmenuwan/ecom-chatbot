@@ -1,6 +1,7 @@
 {
   "greet": ["hello", "hi", "good morning", "good evening"],
   "goodbye": ["bye", "goodbye", "see you"],
+  "show_products": ["show products", "list products", "available products", "what do you have"],
   "add_to_cart": ["add", "buy", "purchase", "order"],
   "check_order": ["order status", "where is my order", "track my order"],
   "recommend": ["suggest", "recommend", "what should I buy"],
