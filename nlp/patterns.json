@@ -1,9 +1,8 @@
 {
-  "greet": "Hello! How can I help you today?",
-  "add_to_cart": "What would you like to add to your cart?",
-  "check_order": "Let me check the status of your order.",
-  "recommend": "Based on your past orders, I can suggest some items.",
-  "repeat_order": "Repeating your previous order now.",
-  "goodbye": "Thanks for shopping with us. Goodbye!",
-  "unknown": "Sorry, I didn't understand that. Can you rephrase?"
+  "greet": ["hello", "hi", "good morning", "good evening"],
+  "goodbye": ["bye", "goodbye", "see you"],
+  "add_to_cart": ["add", "buy", "purchase", "order"],
+  "check_order": ["order status", "where is my order", "track my order"],
+  "recommend": ["suggest", "recommend", "what should I buy"],
+  "repeat_order": ["repeat", "same order", "again", "previous order"]
 }

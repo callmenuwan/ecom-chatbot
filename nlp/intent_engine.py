@@ -9,7 +9,7 @@ class IntentEngine:
 
         self.nlp = spacy.load("en_core_web_sm") # Loads spaCy's English model (for tokenization, lemmatization, etc.)
 
-        pattern_path = os.path.join(os.path.dirname(__file__), "pattern.json") # Path to the JSON file containing intent patterns
+        pattern_path = os.path.join(os.path.dirname(__file__), "patterns.json") # Path to the JSON file containing intent patterns
         with open(pattern_path, "r") as file:
             self.patterns = json.load(file)
 
