@@ -1,62 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>E-Shop Chatbot</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f6f8;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        #chatbox {
+            width: 100%;
+            height: 420px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            margin: 10px 0;
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background-color: #d1e7dd;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .bot {
+            background-color: #f8d7da;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        #input-area {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #input-box {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        #send-button,
+        #voice-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        #send-button:hover,
+        #voice-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    
-      <div id="chatbox">
-        <div id="messages"></div>
-        <form id="chat-form">
-          <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
-          <button type="submit">Send</button>
-          <button type="button" id="voice-btn">🎤</button>
-        </form>
-      </div>
-      
-      <script>
-        const form = document.getElementById("chat-form");
-        const input = document.getElementById("user-input");
-        const messages = document.getElementById("messages");
-        const voiceBtn = document.getElementById("voice-btn");
-      
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const message = input.value;
-          addMessage("You", message);
-          input.value = "";
-      
-          const res = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message }),
-          });
-      
-          const data = await res.json();
-          addMessage("Bot", data.response);
-        });
-      
-        function addMessage(sender, text) {
-          const div = document.createElement("div");
-          div.textContent = `${sender}: ${text}`;
-          messages.appendChild(div);
+
+    <h2>E-Shop Chatbot</h2>
+    <div id="chatbox" style="display: flex; flex-direction: column;"></div>
+
+    <div id="input-area">
+        <input type="text" id="input-box" placeholder="Type your message here..." />
+        <button id="send-button">Send</button>
+        <button id="voice-button">🎤</button>
+    </div>
+
+    <!-- Mic start sound -->
+    <audio id="mic-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const inputBox = document.getElementById("input-box");
+        const sendButton = document.getElementById("send-button");
+        const voiceButton = document.getElementById("voice-button");
+        const micSound = document.getElementById("mic-sound");
+
+        function appendMessage(sender, message) {
+            const p = document.createElement("div");
+            p.classList.add("message", sender === "You" ? "user" : "bot");
+            p.textContent = message;
+            chatbox.appendChild(p);
+            chatbox.scrollTop = chatbox.scrollHeight;
         }
-      
-        // 🎤 Voice button click
-        voiceBtn.addEventListener("click", async () => {
-          addMessage("Bot", "🎤 Listening...");
-      
-          const res = await fetch("/voice", {
-            method: "POST"
-          });
-      
-          const data = await res.json();
-          addMessage("You (voice)", data.user_input);
-          addMessage("Bot", data.response);
+
+        async function sendMessage(text) {
+            appendMessage("You", text);
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await res.json();
+            appendMessage("Bot", data.response);
+        }
+
+        sendButton.onclick = () => {
+            const text = inputBox.value.trim();
+            if (text) {
+                sendMessage(text);
+                inputBox.value = "";
+            }
+        };
+
+        inputBox.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendButton.click();
         });
-      </script>
-            
+
+        voiceButton.onclick = () => {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Sorry, your browser doesn't support voice input.");
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.timeout = 6000;
+
+            micSound.play(); // 🔊 Play mic start sound
+            appendMessage("Bot", "🎙️ Listening...");
+
+            recognition.start();
+
+            recognition.onresult = (event) => {
+                const voiceText = event.results[0][0].transcript;
+                sendMessage(voiceText);
+            };
+
+            recognition.onerror = (event) => {
+                appendMessage("Bot", "⚠️ Voice error: " + event.error);
+            };
+
+            recognition.onend = () => {
+                if (!recognition.resultReceived) {
+                    appendMessage("Bot", "🤔 Didn't catch that. Try again?");
+                }
+            };
+
+            recognition.resultReceived = false;
+            recognition.onresult = function (event) {
+                recognition.resultReceived = true;
+                const voiceText = event.results[0][0].transcript;
+                sendMessage(voiceText);
+            };
+        };
+    </script>
 </body>
 </html>
