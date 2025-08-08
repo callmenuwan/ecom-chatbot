@@ -1,0 +1,9 @@
+Flask
+flask-cors
+spacy
+SpeechRecognition
+PyAudio
+deep-translator
+requests
+scikit-learn
+tensorflow

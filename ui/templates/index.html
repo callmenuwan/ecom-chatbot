@@ -6,89 +6,33 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #f4f6f8;
         }
-
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-
         #chatbox {
             width: 100%;
-            height: 420px;
-            background: white;
+            height: 400px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 15px;
-            overflow-y: auto;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .message {
-            margin: 10px 0;
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 20px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .user {
-            background-color: #d1e7dd;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-
-        .bot {
-            background-color: #f8d7da;
-            align-self: flex-start;
-            margin-right: auto;
-        }
-
-        #input-area {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-
-        #input-box {
-            flex: 1;
             padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            overflow-y: scroll;
+            margin-bottom: 10px;
         }
-
-        #send-button,
-        #voice-button {
+        #input-box {
+            width: 80%;
+            padding: 10px;
+        }
+        #send-button, #voice-button {
             padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-
-        #send-button:hover,
-        #voice-button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-
     <h2>E-Shop Chatbot</h2>
-    <div id="chatbox" style="display: flex; flex-direction: column;"></div>
-
-    <div id="input-area">
-        <input type="text" id="input-box" placeholder="Type your message here..." />
-        <button id="send-button">Send</button>
-        <button id="voice-button">🎤</button>
-    </div>
+    <div id="chatbox"></div>
+    <input type="text" id="input-box" placeholder="Type your message here...">
+    <button id="send-button">Send</button>
+    <button id="voice-button">🎤</button>
 
     <!-- Mic start sound -->
     <audio id="mic-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-
     <script>
         const chatbox = document.getElementById("chatbox");
         const inputBox = document.getElementById("input-box");
@@ -96,14 +40,15 @@
         const voiceButton = document.getElementById("voice-button");
         const micSound = document.getElementById("mic-sound");
 
+        // Function to update chat display
         function appendMessage(sender, message) {
-            const p = document.createElement("div");
-            p.classList.add("message", sender === "You" ? "user" : "bot");
-            p.textContent = message;
+            const p = document.createElement("p");
+            p.innerHTML = `<strong>${sender}:</strong> ${message}`;
             chatbox.appendChild(p);
             chatbox.scrollTop = chatbox.scrollHeight;
         }
 
+        // Send message to Flask
         async function sendMessage(text) {
             appendMessage("You", text);
             const res = await fetch("/chat", {
@@ -116,17 +61,20 @@
         }
 
         sendButton.onclick = () => {
-            const text = inputBox.value.trim();
-            if (text) {
+            const text = inputBox.value;
+            if (text.trim()) {
                 sendMessage(text);
                 inputBox.value = "";
             }
         };
 
         inputBox.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendButton.click();
+            if (e.key === "Enter") {
+                sendButton.click();
+            }
         });
 
+        // Voice recognition
         voiceButton.onclick = () => {
             if (!('webkitSpeechRecognition' in window)) {
                 alert("Sorry, your browser doesn't support voice input.");
@@ -137,11 +85,10 @@
             recognition.lang = 'en-US';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.timeout = 6000;
 
             micSound.play(); // 🔊 Play mic start sound
+            
             appendMessage("Bot", "🎙️ Listening...");
-
             recognition.start();
 
             recognition.onresult = (event) => {
@@ -150,20 +97,7 @@
             };
 
             recognition.onerror = (event) => {
-                appendMessage("Bot", "⚠️ Voice error: " + event.error);
-            };
-
-            recognition.onend = () => {
-                if (!recognition.resultReceived) {
-                    appendMessage("Bot", "🤔 Didn't catch that. Try again?");
-                }
-            };
-
-            recognition.resultReceived = false;
-            recognition.onresult = function (event) {
-                recognition.resultReceived = true;
-                const voiceText = event.results[0][0].transcript;
-                sendMessage(voiceText);
+                appendMessage("Bot", "❌ Voice error: " + event.error);
             };
         };
     </script>
