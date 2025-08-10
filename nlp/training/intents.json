@@ -1,0 +1,33 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["Hello", "Hi", "Good day", "Hey", "How are you?"],
+      "responses": ["Hello!", "Hi there!", "Greetings!"]
+    },
+    {
+      "tag": "order_product",
+      "patterns": ["I want to order a product", "Buy item", "Add to cart", "Can I purchase this?"],
+      "responses": ["What would you like to buy?", "Sure, tell me the product name."]
+    },
+    {
+      "tag": "show_products",
+      "patterns": [
+        "Show me products",
+        "What products do you have?",
+        "List items",
+        "Show items",
+        "products",
+        "Display products",
+        "Can I see products?",
+        "Show products"
+      ],
+      "responses": ["Here's your products:"]
+    },
+    {
+      "tag": "show_cart",
+      "patterns": ["Show my cart", "What's in the cart?", "Cart items"],
+      "responses": ["Here's your cart:"]
+    }
+  ]
+}

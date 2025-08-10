@@ -1,0 +1,26 @@
+-- NOVA AI Banking chatbot --
+
+Live bot: http://165.232.172.225:5000/
+Dashboard: http://165.232.172.225:5000/dashboard
+Git repo: https://github.com/nuwan315/banking-chatbot
+
+Installartion guide:
+
+Step 1: Install dependacies
+pip install Flask tensorflow-cpu numpy deep-translator spacy pyspellchecker scikit-learn
+python3 -m spacy download en_core_web_sm
+
+Step 2: Create database
+python3 create_db.py
+Success message: Database and accounts table created.
+
+Step 3: Train chatbot model
+python3 preprocess.py
+python3 train_model.py
+Success message: ✅ Model trained and saved.
+
+Step 4: Run App
+python3 app.py
+
+Step 5: Access via from local pc
+http://127.0.0.1:5000/

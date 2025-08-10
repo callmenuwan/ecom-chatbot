@@ -1,5 +1,9 @@
 Flask
+Flask-Session
 flask-cors
+tensorflow
+keras
+numpy
 spacy
 SpeechRecognition
 PyAudio

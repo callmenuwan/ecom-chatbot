@@ -4,6 +4,45 @@ import spacy
 import json
 import os
 from deep_translator import GoogleTranslator
+import numpy as np
+import pickle
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# Load model and preprocessors
+model = load_model("nlp/training/intent_model.h5")
+with open("nlp/training/tokenizer.pickle", "rb") as handle:
+    tokenizer = pickle.load(handle)
+
+with open("nlp/training/label_encoder.pickle", "rb") as enc:
+    lbl_encoder = pickle.load(enc)
+
+# Parameters (same used in training)
+max_len = 20
+
+# Load intents for response lookup (optional)
+with open("nlp/training/intents.json") as file:
+    intents_data = json.load(file)
+
+def predict_intent(user_input):
+    seq = tokenizer.texts_to_sequences([user_input])
+    padded = pad_sequences(seq, truncating='post', maxlen=max_len)
+    predictions = model.predict(padded, verbose=0)
+    intent_index = np.argmax(predictions)
+    intent_tag = lbl_encoder.inverse_transform([intent_index])[0]
+    confidence = float(np.max(predictions))
+
+    # Get response from intents.json
+    response = "I'm not sure how to respond."
+    for intent in intents_data['intents']:
+        if intent['tag'] == intent_tag:
+            response = np.random.choice(intent['responses'])
+            break
+        
+    return intent_tag, confidence, response
+
+
+
 
 class IntentEngine:
     def __init__(self):

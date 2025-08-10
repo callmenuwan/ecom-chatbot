@@ -1,0 +1,127 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey there",
+        "Good morning",
+        "Good afternoon",
+        "What's up?",
+        "How are you?",
+        "Hey"
+      ],
+      "responses": [
+        "Hello! How can I assist you today?",
+        "Hi there! Need help with something?",
+        "Hey! What can I do for you?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Bye",
+        "See you later",
+        "Goodbye",
+        "Catch you later",
+        "Talk to you soon",
+        "See ya",
+        "I have to go"
+      ],
+      "responses": [
+        "Goodbye! Have a great day.",
+        "See you soon! Thanks for banking with us.",
+        "Take care! We're here if you need anything else."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thanks",
+        "Thank you",
+        "That's helpful",
+        "Thank you for help",
+        "Appreciate it",
+        "Thanks a lot",
+        "Much appreciated"
+      ],
+      "responses": [
+        "You're welcome!",
+        "Anytime!",
+        "Happy to help!"
+      ]
+    },
+    {
+      "tag": "account_types",
+      "patterns": [
+        "What types of accounts do you have?",
+        "Tell me about your account options",
+        "List available bank accounts",
+        "What are the account types?",
+        "Different types of bank accounts?",
+        "What accounts do you offer?"
+      ],
+      "responses": [
+        "__fetch_account_types__"
+      ]
+    },
+    {
+      "tag": "balance",
+      "patterns": [
+        "What is my balance?",
+        "Can you tell me my account balance?",
+        "I want to check my balance",
+        "How much money do I have?",
+        "Show me the balance"
+      ],
+      "responses": [
+        "Please enter your account number to check your balance."
+      ]
+    },
+    {
+      "tag": "fund_transfer",
+      "patterns": [
+        "Transfer money",
+        "Send funds",
+        "I want to send money",
+        "Transfer cash to another account",
+        "I need to make a transfer",
+        "Move money to another person",
+        "Make a payment"
+      ],
+      "responses": [
+        "Sure, who would you like to send money to?",
+        "Absolutely! Please provide recipient details.",
+        "Let's do that. What's the recipient's name or account number?"
+      ]
+    },
+    {
+      "tag": "loan_info",
+      "patterns": [
+        "Tell me about loan options",
+        "Do you offer personal loans?",
+        "What types of loans do you have?",
+        "Loan information",
+        "Can I apply for a loan?",
+        "How do I get a loan?"
+      ],
+      "responses": [
+        "We offer personal, education, and business loans. Would you like to learn more about one?"
+      ]
+    },
+    {
+      "tag": "unknown",
+      "patterns": [
+        "aslkdjals",
+        "qwertyuiop",
+        "random text",
+        "blabla"
+      ],
+      "responses": [
+        "Sorry, I didn't understand that. Could you rephrase?",
+        "I'm not sure what you mean. Try asking something else."
+      ]
+    }
+  ]
+}
