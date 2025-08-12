@@ -6,7 +6,7 @@ if ROOT_DIR not in sys.path:
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
-from utils.api_client import fetch_products, place_order
+from utils.api_client import fetch_products, place_order, extract_entities, fetch_filtered_products
 # from nlp.intent_engine import IntentEngine
 from nlp.intent_engine import predict_intent
 from utils.voice_input import listen_to_user
@@ -36,6 +36,26 @@ def chat():
 
     if confidence < 0.6:
         response_text = "Sorry, I didn't understand that. Can you rephrase?"
+
+    # Handle product search intent
+    if intent == "product_search":
+        entities = extract_entities(user_message)
+        print("Extracted entities:", entities)
+
+        products = fetch_filtered_products(
+            category=entities['category'],
+            price=entities['price'],
+            tags=entities['tags']
+        )
+
+        if products:
+            product_list = "\n".join([
+                f"- {p['product_name']} (Rs. {p['product_price']})"
+                for p in products
+            ])
+            response_text = f"Here are some options I found:\n{product_list}"
+        else:
+            response_text = "Sorry, I couldn't find any products matching your request."
 
     return jsonify({
         "response": response_text,

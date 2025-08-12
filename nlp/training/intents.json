@@ -11,18 +11,9 @@
       "responses": ["What would you like to buy?", "Sure, tell me the product name."]
     },
     {
-      "tag": "show_products",
-      "patterns": [
-        "Show me products",
-        "What products do you have?",
-        "List items",
-        "Show items",
-        "products",
-        "Display products",
-        "Can I see products?",
-        "Show products"
-      ],
-      "responses": ["Here's your products:"]
+      "tag": "product_search",
+      "patterns": ["I want a", "Show me", "Looking for", "Need a", "Suggest"],
+      "responses": ["Sure! Let me find that for you.", "Got it. Searching our products..."]
     },
     {
       "tag": "show_cart",
