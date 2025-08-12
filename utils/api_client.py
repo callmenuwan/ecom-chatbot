@@ -54,8 +54,8 @@ def place_order(customer, cart_items):
 
 
 def extract_entities(text):
-    
-    doc = nlp(text.lower())
+    text = text.lower()
+    doc = nlp(text)
     tokens = [token.lemma_ for token in doc]
 
     categories = ['mouse', 'keyboard', 'laptop', 'monitor']
