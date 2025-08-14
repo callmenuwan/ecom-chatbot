@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, re
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
@@ -27,6 +27,21 @@ def home():
 def chat():
     data = request.get_json()
     user_message = data.get("message", "").strip()
+
+    if session.get("email") is None:
+        if user_message == "__get_email__":
+            return jsonify({"response": "👋 Welcome! Please enter your registered email to continue, or type a new email if you're a new customer."})
+
+        elif re.match(r"[^@]+@[^@]+\.[^@]+", user_message):  # Basic email validation
+            session["email"] = user_message
+            # Optionally store in DB here (you can write DB logic)
+            return jsonify({"response": f"✅ Thanks! You’re now signed in as {user_message}. How can I help you today?"})
+        
+        else:
+            return jsonify({"response": "❗That doesn’t look like a valid email. Please enter a valid email address."})
+
+    # Email already stored → proceed with normal bot logic
+    intent = predict_intent(user_message)
 
     if not user_message:
         return jsonify({"response": "Please enter a message."})
