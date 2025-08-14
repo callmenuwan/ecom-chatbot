@@ -8,23 +8,48 @@ if ($conn->connect_error) {
 }
 
 // Input parameters
-$category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : '';
-$max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 0;
-$tags = isset($_GET['tags']) ? $conn->real_escape_string($_GET['tags']) : '';
+$category = $_GET['category'] ?? '';
+$tags = $_GET['tags'] ?? '';
+$price = $_GET['price'] ?? 0;
+$price_condition = $_GET['price_condition'] ?? '';
 
-// Build one compact SQL query
-$sql = "
-    SELECT * FROM products
-    WHERE 
-        ('$category' = '' OR product_category LIKE '%$category%')
-        AND ($max_price = 0 OR product_price <= $max_price)
-        AND ('$tags' = '' OR product_tags LIKE '%$tags%' OR product_description LIKE '%$tags%')
-";
+// Escape to prevent SQL injection
+$category = $conn->real_escape_string($category);
+$tags = $conn->real_escape_string($tags);
 
-// Run query
+// Start the SQL query
+$sql = "SELECT * FROM products WHERE 1=1";
+
+// Filter by category
+if (!empty($category)) {
+    $sql .= " AND product_category LIKE '%$category%'";
+}
+
+// Filter by tags or description
+if (!empty($tags)) {
+    $sql .= " AND (product_tags LIKE '%$tags%' OR product_description LIKE '%$tags%')";
+}
+
+// Filter by price condition
+if ($price > 0) {
+    if ($price_condition == 'under') {
+        $sql .= " AND product_price <= $price";
+    } elseif ($price_condition == 'above') {
+        $sql .= " AND product_price >= $price";
+    } elseif ($price_condition == 'around') {
+        $low = $price - 2000;
+        $high = $price + 2000;
+        $sql .= " AND product_price BETWEEN $low AND $high";
+    } else {
+        $sql .= " AND product_price = $price";
+    }
+}
+
+// Run the query
 $result = $conn->query($sql);
-$products = [];
 
+// Show results
+$products = [];
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $products[] = $row;

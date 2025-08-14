@@ -45,6 +45,7 @@ def chat():
         products = fetch_filtered_products(
             category=entities['category'],
             price=entities['price'],
+            price_condition=entities['price_condition'],
             tags=entities['tags']
         )
 

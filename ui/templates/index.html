@@ -40,12 +40,28 @@
         const voiceButton = document.getElementById("voice-button");
         const micSound = document.getElementById("mic-sound");
 
-        // Function to update chat display
+        window.onload = () => {
+            sendMessage("__get_email__");  // Trigger email prompt from Flask
+        };
+
+        // 🔊 Text-to-Speech
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';  // Change if you want to support other languages
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Update chat and optionally speak
         function appendMessage(sender, message) {
             const p = document.createElement("p");
             p.innerHTML = `<strong>${sender}:</strong> ${message}`;
             chatbox.appendChild(p);
             chatbox.scrollTop = chatbox.scrollHeight;
+
+            // 🔊 Speak bot message only
+            if (sender === "Bot") {
+                speak(message);
+            }
         }
 
         // Send message to Flask
@@ -89,7 +105,9 @@
             micSound.play(); // 🔊 Play mic start sound
             
             appendMessage("Bot", "🎙️ Listening...");
-            recognition.start();
+                        setTimeout(() => {
+                recognition.start();
+            }, 200);  // wait 200ms to allow DOM update
 
             recognition.onresult = (event) => {
                 const voiceText = event.results[0][0].transcript;

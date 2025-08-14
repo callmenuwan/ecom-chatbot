@@ -1,6 +1,7 @@
 import requests
 import json
 import re
+from fuzzywuzzy import fuzz
 import spacy
 nlp = spacy.load("en_core_web_sm")
 
@@ -52,6 +53,11 @@ def place_order(customer, cart_items):
         print("Order API error:", e)
         return {"success": False, "error": str(e)}
 
+def fuzzy_match(word, choices, threshold=80):
+    for c in choices:
+        if fuzz.ratio(word, c) >= threshold:
+            return c
+    return None
 
 def extract_entities(text):
     text = text.lower()
@@ -59,30 +65,57 @@ def extract_entities(text):
     tokens = [token.lemma_ for token in doc]
 
     categories = ['mouse', 'keyboard', 'laptop', 'monitor']
-    category = next((c for c in categories if c in tokens), None)
-
     tag_keywords = ['gaming', 'wireless', 'rgb', 'mechanical', 'silent', 'compact', 'office']
-    tags = [kw for kw in tag_keywords if kw in tokens]
+
+    # Fuzzy match for category
+    category = None
+    for token in tokens:
+        match = fuzzy_match(token, categories)
+        if match:
+            category = match
+            break
+
+    # Fuzzy match for tags
+    tags = []
+    for token in tokens:
+        match = fuzzy_match(token, tag_keywords)
+        if match and match not in tags:
+            tags.append(match)
 
     price = None
-    for ent in doc.ents:
-        if ent.label_ == "MONEY":
-            price = int(''.join(filter(str.isdigit, ent.text)))
-            break
-    
+    price_condition = None  # e.g., 'under', 'around'
+
+    # Regex to extract number
+    price_match = re.search(r'(\d{3,6})', text)
+    if price_match:
+        price = int(price_match.group(1))
+
+        # Check for price conditions
+        if any(word in text for word in ['under', 'below', 'less than', 'max', 'cheaper' 'lower']):
+            price_condition = 'under'
+        elif any(word in text for word in ['around', 'near', 'about']):
+            price_condition = 'around'
+        elif any(word in text for word in ['over', 'above', 'more than', 'minimum']):
+            price_condition = 'above'
+        else:
+            price_condition = 'exact'
+
     return {
         'category': category,
         'price': price,
+        'price_condition': price_condition,
         'tags': tags
     }
 
-def fetch_filtered_products(category=None, price=None, tags=None):
+def fetch_filtered_products(category=None, price=None, price_condition=None, tags=None):
     try:
         params = {}
         if category:
             params["category"] = category
         if price:
-            params["max_price"] = price
+            params["price"] = price
+        if category:
+            params["price_condition"] = price_condition
         if tags:
             params["tags"] = ",".join(tags)
 
